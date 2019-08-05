@@ -7,8 +7,8 @@ commands:
   elytra:
     description: Gibt dir eine Kostenlose Elytra (ein Flug)
     aliases:
-      -freeElytra
-      -fElytra
+    - freeElytra
+    - fElytra
 permissions:
   freeElytra.elytra:
     description: Permission for Getting an Elytra
