@@ -1,0 +1,23 @@
+name: FreeElytra
+version: 0.0-Snapshot
+main: sf
+author: Blaumeise03
+
+commands:
+  elytra:
+    description: Gibt dir eine Kostenlose Elytra (ein Flug)
+    aliases:
+      -freeElytra
+      -fElytra
+permissions:
+  freeElytra.elytra:
+    description: Permission for Getting an Elytra
+    default: op
+  freeElytra.*:
+    description: Wildcard permission
+    children:
+      freeElytra.elytra: true
+      freeElytra.settings: true
+  freeElytra.settings:
+    description: Change Settings of FreeElytra
+    default: op
