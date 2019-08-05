@@ -1,6 +1,6 @@
 name: FreeElytra
 version: 0.0-Snapshot
-main: sf
+main: de.blaumeise03.freeElytra.FreeElytra
 author: Blaumeise03
 
 commands:
