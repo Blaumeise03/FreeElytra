@@ -10,6 +10,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,10 +22,7 @@ import org.bukkit.util.Vector;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FreeElytra extends JavaPlugin {
 
@@ -94,7 +93,7 @@ public class FreeElytra extends JavaPlugin {
         pm.registerEvents(new Listeners(), this);
 
         getLogger().info("Setting up Commands...");
-        commands.add(new de.blaumeise03.freeElytra.Command("elytra", "Leiht dir eine Elytra") {
+        commands.add(new de.blaumeise03.freeElytra.Command("elytra", "Leiht dir eine Elytra", new Permission("freeElytra.elytra")) {
             @Override
             public void onCommand(String[] args, CommandSender sender) {
                 if (sender instanceof Player) {
@@ -104,14 +103,15 @@ public class FreeElytra extends JavaPlugin {
                         return;
                     }
                     chestplates.put(player, player.getInventory().getChestplate());
-                    player.getInventory().setChestplate(new ItemStack(Material.ELYTRA));
+                    ItemStack elytra = new ItemStack(Material.ELYTRA);
+                    elytra.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+                    ItemMeta meta = elytra.getItemMeta();
+                    assert meta != null;
+                    meta.setLore(Arrays.asList("§4Leih Elytra", "§6Wird nach dem Flug automatisch abgegeben!"));
+                    elytra.setItemMeta(meta);
+                    player.getInventory().setChestplate(elytra);
                     getLogger().info(player.getName() + " got an Elytra!");
-                    Bukkit.getScheduler().runTaskLater(FreeElytra.plugin, new Runnable() {
-                        @Override
-                        public void run() {
-                            player.setGliding(true);
-                        }
-                    }, 2);
+                    Bukkit.getScheduler().runTaskLater(FreeElytra.plugin, () -> player.setGliding(true), 2);
                     player.sendMessage("§aViel Spaß!");
                     player.setVelocity(new Vector(0, 10, 0)); //Is this too much? Who cares!
                 } else {
@@ -182,14 +182,12 @@ public class FreeElytra extends JavaPlugin {
         getLogger().info("Disabled!");
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         for (de.blaumeise03.freeElytra.Command c : commands) {
-            if (c.getLabel().equalsIgnoreCase(label)) {
-                c.onCommand(args, sender);
-                return true;
-            }
+            c.run(sender, label, args);
         }
-        return false;
+        return true;
     }
 }
