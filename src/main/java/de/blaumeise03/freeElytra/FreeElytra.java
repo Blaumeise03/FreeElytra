@@ -127,7 +127,7 @@ public class FreeElytra extends JavaPlugin {
     public void onDisable() {
         getLogger().info("Disabling...");
         if (chestplates.size() != 0) {
-            getLogger().warning("\n\n\n\n\n===============================");
+            getLogger().warning("==================STARTING LOG==================");
             getLogger().warning("WARNING! Some Players have an Elytra!");
             getLogger().warning("The Players might have got their Chestplate back.");
             getLogger().warning("SAVING TO LOG...");
@@ -167,7 +167,7 @@ public class FreeElytra extends JavaPlugin {
                 getLogger().warning("");
                 ItemStack c = chestplates.get(p);
                 getLogger().warning("Player: " + p.getName());
-                getLogger().warning("UUDI: " + p.getUniqueId());
+                getLogger().warning("UUID: " + p.getUniqueId());
                 getLogger().warning("We try to restore the Item. For a information look into the log wich will be generated, but it might not be accurate.");
                 getLogger().warning("Chestplate:");
                 getLogger().warning(c.getType().name());
@@ -177,7 +177,7 @@ public class FreeElytra extends JavaPlugin {
                     getLogger().warning(e.toString() + ": " + c.getEnchantments().get(e));
                 }
             }
-            getLogger().warning("LOG COMPLETE===============================\n\n\n\n\n");
+            getLogger().warning("==================LOG COMPLETE==================");
         }
         getLogger().info("Disabled!");
     }
