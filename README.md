@@ -10,4 +10,5 @@ Features:
  - Bei Disconnect bekommst du die Brustplatte sofort zurück + für eine kurze Zeit Resistenz 4 (100% Schadensreduktion)
  - Bei Server-stop bekommen ebenfalls alle Spieler ihre Brustplatte + Resistenz, zusätzlich werden die Brustplatten gelogt (zur Sicherheit, falls die Spieler die nicht zurück bekommen sollten)
  
- Command: /elytra
+Command: /elytra
+Bugs gerne reporten, Danke!
