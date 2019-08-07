@@ -115,7 +115,26 @@ public class FreeElytra extends JavaPlugin {
         commands.add(new de.blaumeise03.freeElytra.Command("elytra", "Leiht dir eine Elytra", new Permission("freeElytra.elytra")) {
             @Override
             public void onCommand(String[] args, CommandSender sender) {
-                if (sender instanceof Player) {
+                if (args.length > 0) {
+                    Player player = Bukkit.getPlayer(args[0]);
+                    if (player == null) {
+                        sender.sendMessage(args[0] + " ist kein Spieler!");
+                        return;
+                    }
+                    chestplates.put(player, player.getInventory().getChestplate());
+                    ItemStack elytra = new ItemStack(Material.ELYTRA);
+                    elytra.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+                    ItemMeta meta = elytra.getItemMeta();
+                    assert meta != null;
+                    meta.setLore(Arrays.asList("§4Leih Elytra", "§6Wird nach dem Flug automatisch abgegeben!"));
+                    elytra.setItemMeta(meta);
+                    player.getInventory().setChestplate(elytra);
+                    getLogger().info(player.getName() + " got an Elytra!");
+                    Bukkit.getScheduler().runTaskLater(FreeElytra.plugin, () -> player.setGliding(true), 2);
+                    player.sendMessage("§aViel Spaß!");
+                    player.setVelocity(new Vector(0, 10, 0)); //Is this too much? Who cares!
+                } else if (sender instanceof Player) {
+
                     final Player player = (Player) sender;
                     if (chestplates.containsKey(player)) {
                         player.sendMessage("§4Du hast bereits eine!");
