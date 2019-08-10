@@ -6,6 +6,10 @@ author: Blaumeise03
 commands:
   elytra:
     description: Gibt dir eine Kostenlose Elytra (ein Flug)
+  addPad:
+    description: Fügt ein StartPad hinzu.
+  removePad:
+    description: Löscht ein StartPad.
 permissions:
   freeElytra.elytra:
     description: Permission for Getting an Elytra

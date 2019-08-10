@@ -99,6 +99,38 @@ public class FreeElytra extends JavaPlugin {
         createConfigs();
     }
 
+    public static FileConfiguration getConfiguration() {
+        return configuration;
+    }
+
+    public static void shootPlayer(Player player) {
+
+        chestplates.put(player, player.getInventory().getChestplate());
+        ItemStack elytra = new ItemStack(Material.ELYTRA);
+        elytra.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+        ItemMeta meta = elytra.getItemMeta();
+        assert meta != null;
+        meta.setLore(Arrays.asList("§4Leih Elytra", "§6Wird nach dem Flug automatisch abgegeben!"));
+        elytra.setItemMeta(meta);
+        player.getInventory().setChestplate(elytra);
+        FreeElytra.plugin.getLogger().info(player.getName() + " got an Elytra!");
+        Bukkit.getScheduler().runTaskLater(FreeElytra.plugin, () -> player.setGliding(true), 2);
+        player.sendMessage("§aViel Spaß!");
+        Vector v = player.getVelocity();
+        v.add(new Vector(0, 10, 0));
+
+        player.setVelocity(new Vector(Math.max(v.getX(), 15), Math.max(v.getY(), 15), Math.max(v.getZ(), 15))); //Is this too much? Who cares!
+    }
+
+    @SuppressWarnings("NullableProblems")
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        for (de.blaumeise03.freeElytra.Command c : commands) {
+            c.run(sender, label, args);
+        }
+        return true;
+    }
+
     @Override
     public void onEnable() {
         getLogger().info("FreeElytra by Blaumeise03");
@@ -106,13 +138,14 @@ public class FreeElytra extends JavaPlugin {
         plugin = this;
         getLogger().info("Loading Configs...");
         createConfigs();
-
+        reloadConfigs();
         getLogger().info("Setting up Events");
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new Listeners(), this);
+        pm.registerEvents(new StartPadListeners(), this);
 
         getLogger().info("Setting up Commands...");
-        commands.add(new de.blaumeise03.freeElytra.Command("elytra", "Leiht dir eine Elytra", new Permission("freeElytra.elytra")) {
+        commands.add(new de.blaumeise03.freeElytra.Command("elytra", "Leiht dir eine Elytra", new Permission("freeElytra.elytra"), false) {
             @Override
             public void onCommand(String[] args, CommandSender sender) {
                 if (args.length > 0) {
@@ -121,18 +154,7 @@ public class FreeElytra extends JavaPlugin {
                         sender.sendMessage(args[0] + " ist kein Spieler!");
                         return;
                     }
-                    chestplates.put(player, player.getInventory().getChestplate());
-                    ItemStack elytra = new ItemStack(Material.ELYTRA);
-                    elytra.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
-                    ItemMeta meta = elytra.getItemMeta();
-                    assert meta != null;
-                    meta.setLore(Arrays.asList("§4Leih Elytra", "§6Wird nach dem Flug automatisch abgegeben!"));
-                    elytra.setItemMeta(meta);
-                    player.getInventory().setChestplate(elytra);
-                    getLogger().info(player.getName() + " got an Elytra!");
-                    Bukkit.getScheduler().runTaskLater(FreeElytra.plugin, () -> player.setGliding(true), 2);
-                    player.sendMessage("§aViel Spaß!");
-                    player.setVelocity(new Vector(0, 10, 0)); //Is this too much? Who cares!
+                    shootPlayer(player);
                 } else if (sender instanceof Player) {
 
                     final Player player = (Player) sender;
@@ -140,23 +162,55 @@ public class FreeElytra extends JavaPlugin {
                         player.sendMessage("§4Du hast bereits eine!");
                         return;
                     }
-                    chestplates.put(player, player.getInventory().getChestplate());
-                    ItemStack elytra = new ItemStack(Material.ELYTRA);
-                    elytra.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
-                    ItemMeta meta = elytra.getItemMeta();
-                    assert meta != null;
-                    meta.setLore(Arrays.asList("§4Leih Elytra", "§6Wird nach dem Flug automatisch abgegeben!"));
-                    elytra.setItemMeta(meta);
-                    player.getInventory().setChestplate(elytra);
-                    getLogger().info(player.getName() + " got an Elytra!");
-                    Bukkit.getScheduler().runTaskLater(FreeElytra.plugin, () -> player.setGliding(true), 2);
-                    player.sendMessage("§aViel Spaß!");
-                    player.setVelocity(new Vector(0, 10, 0)); //Is this too much? Who cares!
+                    shootPlayer(player);
                 } else {
                     sender.sendMessage("You must be a Player!");
                 }
             }
         });
+
+        commands.add(new de.blaumeise03.freeElytra.Command("addPad", "Fügt ein Start-Pad hinzu", new Permission("freeElytra.settings"), true) {
+            @Override
+            public void onCommand(String[] args, CommandSender sender) {
+                Player player = (Player) sender;
+                if (args.length < 7) {
+                    player.sendMessage("§aBenutzung: §4/addPad <name> <pos1x> <pos1y> <pos1z> <pos2x> <pos2y> <pos2z>");
+                } else {
+                    try {
+                        int x1 = Integer.parseInt(args[1]);
+                        int y1 = Integer.parseInt(args[2]);
+                        int z1 = Integer.parseInt(args[3]);
+
+                        int x2 = Integer.parseInt(args[4]);
+                        int y2 = Integer.parseInt(args[5]);
+                        int z2 = Integer.parseInt(args[6]);
+
+                        String name = args[0];
+
+                        configuration.set("Pads." + name.toLowerCase() + ".X1", x1);
+                        configuration.set("Pads." + name.toLowerCase() + ".Y1", y1);
+                        configuration.set("Pads." + name.toLowerCase() + ".Z1", z1);
+
+                        configuration.set("Pads." + name.toLowerCase() + ".X2", x2);
+                        configuration.set("Pads." + name.toLowerCase() + ".Y2", y2);
+                        configuration.set("Pads." + name.toLowerCase() + ".Z2", z2);
+
+                        configuration.set("Pads." + name.toLowerCase() + ".world", player.getWorld().getUID().toString());
+
+                        List<String> pads = configuration.getStringList("Pads.All");
+                        pads.add(name.toLowerCase());
+                        configuration.set("Pads.All", pads);
+                        StartPad.load();
+                        sender.sendMessage("§aStart-Pad erzeugt!");
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage("Bitte gebe Zahlen an!");
+                    }
+                }
+            }
+        });
+
+        getLogger().info("Loading Start-Pads...");
+        StartPad.load();
 
         getLogger().info("Enabled!");
     }
@@ -217,15 +271,7 @@ public class FreeElytra extends JavaPlugin {
             }
             getLogger().warning("==================LOG COMPLETE==================");
         }
+        saveConfigs();
         getLogger().info("Disabled!");
-    }
-
-    @SuppressWarnings("NullableProblems")
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        for (de.blaumeise03.freeElytra.Command c : commands) {
-            c.run(sender, label, args);
-        }
-        return true;
     }
 }

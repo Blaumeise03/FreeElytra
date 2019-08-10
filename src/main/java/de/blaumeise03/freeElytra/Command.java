@@ -53,6 +53,13 @@ abstract public class Command {
         this.onlyPlayer = onlyPlayer;
     }
 
+    public Command(String label, String help, Permission permission, boolean onlyPlayer) {
+        this.label = label;
+        this.help = help;
+        this.permission = permission;
+        this.onlyPlayer = onlyPlayer;
+    }
+
     public abstract void onCommand(String[] args, CommandSender sender);
 
     public void onNoPermission(CommandSender sender) {
