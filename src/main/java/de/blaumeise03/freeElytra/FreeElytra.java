@@ -51,6 +51,7 @@ public class FreeElytra extends JavaPlugin {
     private static List<de.blaumeise03.freeElytra.Command> commands = new ArrayList<>();
 
     private static Map<Player, ItemStack> chestplates = new HashMap<>(); //We won't the Players to loose their Stuff :c
+    private static List<Player> damageDelay = new ArrayList<>(); //To prevent Player from taking damage directly after loosing the Elytra
 
     private static FileConfiguration configuration;
     private static File confF;
@@ -59,12 +60,25 @@ public class FreeElytra extends JavaPlugin {
         return chestplates.containsKey(p);
     }
 
+    public static boolean hasPlayerDamageProtection(Player p) {
+        return damageDelay.contains(p);
+    }
+
     public static ItemStack getChestplate(Player p) {
         return chestplates.get(p);
     }
 
     public static void removePlayer(Player p) {
         chestplates.remove(p);
+    }
+
+    public static void removePlayerDamage(Player p) {
+        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+            @Override
+            public void run() {
+                damageDelay.remove(p);
+            }
+        }, 10);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -105,7 +119,10 @@ public class FreeElytra extends JavaPlugin {
 
     public static void shootPlayer(Player player) {
 
-        chestplates.put(player, player.getInventory().getChestplate());
+        if (!chestplates.containsKey(player)) {
+            chestplates.put(player, player.getInventory().getChestplate());
+        }
+        damageDelay.add(player);
         ItemStack elytra = new ItemStack(Material.ELYTRA);
         elytra.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
         ItemMeta meta = elytra.getItemMeta();
@@ -114,12 +131,12 @@ public class FreeElytra extends JavaPlugin {
         elytra.setItemMeta(meta);
         player.getInventory().setChestplate(elytra);
         FreeElytra.plugin.getLogger().info(player.getName() + " got an Elytra!");
-        Bukkit.getScheduler().runTaskLater(FreeElytra.plugin, () -> player.setGliding(true), 2);
+        Bukkit.getScheduler().runTaskLater(FreeElytra.plugin, () -> player.setGliding(true), 6);
         player.sendMessage("§aViel Spaß!");
         Vector v = player.getVelocity();
-        v.add(new Vector(0, 10, 0));
+        v.add(new Vector(1.5, 10, 1.5));
 
-        player.setVelocity(new Vector(Math.max(v.getX(), 15), Math.max(v.getY(), 15), Math.max(v.getZ(), 15))); //Is this too much? Who cares!
+        player.setVelocity(new Vector(Math.min(v.getX(), 4), Math.min(v.getY(), 15), Math.min(v.getZ(), 4))); //Is this too much? Who cares!
     }
 
     @SuppressWarnings("NullableProblems")
@@ -205,6 +222,27 @@ public class FreeElytra extends JavaPlugin {
                     } catch (NumberFormatException e) {
                         sender.sendMessage("Bitte gebe Zahlen an!");
                     }
+                }
+            }
+        });
+
+        commands.add(new de.blaumeise03.freeElytra.Command("removePad", "Löscht ein StartPad", new Permission("freeElytra.settings")) {
+            @Override
+            public void onCommand(String[] args, CommandSender sender) {
+                if (args.length >= 1) {
+                    List<String> pads = configuration.getStringList("Pads.All");
+                    String pad = args[0].toLowerCase();
+                    if (pads.contains(pad)) {
+                        pads.remove(pad);
+                        configuration.set("Pads." + pad, null);
+                        configuration.set("Pads.All", pads);
+                        sender.sendMessage("§aStartPad gelöscht!");
+                        StartPad.load();
+                    } else {
+                        sender.sendMessage("§4StartPad nicht vorhanden!");
+                    }
+                } else {
+                    sender.sendMessage("§4Bitte gebe ein StartPad an!");
                 }
             }
         });

@@ -28,7 +28,7 @@ import java.util.List;
 
 public class StartPadListeners implements Listener {
 
-    private static List<Player> delay = new ArrayList<>();
+    public static List<Player> delay = new ArrayList<>();
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
@@ -36,12 +36,7 @@ public class StartPadListeners implements Listener {
             if (!delay.contains(e.getPlayer())) {
                 FreeElytra.shootPlayer(e.getPlayer());
                 delay.add(e.getPlayer());
-                Bukkit.getScheduler().runTaskLaterAsynchronously(FreeElytra.plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        delay.remove(e.getPlayer());
-                    }
-                }, 10);
+                Bukkit.getScheduler().runTaskLaterAsynchronously(FreeElytra.plugin, () -> delay.remove(e.getPlayer()), 10);
             }
         }
     }
