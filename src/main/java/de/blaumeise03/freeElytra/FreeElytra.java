@@ -215,7 +215,9 @@ public class FreeElytra extends JavaPlugin {
                         configuration.set("Pads." + name.toLowerCase() + ".world", player.getWorld().getUID().toString());
 
                         List<String> pads = configuration.getStringList("Pads.All");
-                        pads.add(name.toLowerCase());
+                        if (!pads.contains(name.toLowerCase()))
+                            pads.add(name.toLowerCase());
+                        else sender.sendMessage("§6 Pad wird überschrieben.");
                         configuration.set("Pads.All", pads);
                         StartPad.load();
                         sender.sendMessage("§aStart-Pad erzeugt!");
