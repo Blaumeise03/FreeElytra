@@ -80,4 +80,20 @@ public class StartPad {
 
         return validX && validY && validZ && validWorld;
     }
+
+    public static List<StartPad> getStartPads() {
+        return startPads;
+    }
+
+    public Location getLoc1() {
+        return loc1;
+    }
+
+    public Location getLoc2() {
+        return loc2;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

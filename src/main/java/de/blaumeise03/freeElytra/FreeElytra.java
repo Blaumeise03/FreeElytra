@@ -20,6 +20,7 @@
 package de.blaumeise03.freeElytra;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -245,6 +246,15 @@ public class FreeElytra extends JavaPlugin {
                     }
                 } else {
                     sender.sendMessage("§4Bitte gebe ein StartPad an!");
+                }
+            }
+        });
+
+        commands.add(new de.blaumeise03.freeElytra.Command("listPads", "Listet alle Pads auf", new Permission("freeElytra.settings"), false) {
+            @Override
+            public void onCommand(String[] args, CommandSender sender) {
+                for (StartPad pad : StartPad.getStartPads()) {
+                    sender.sendMessage(ChatColor.GREEN + "StartPad: " + pad.getName() + ", Eckpunkt1: " + pad.getLoc1().getX() + "|" + pad.getLoc1().getY() + "|" + pad.getLoc1().getZ() + " Eckpunkt2: " + pad.getLoc2().getX() + "|" + pad.getLoc2().getY() + "|" + pad.getLoc2().getZ());
                 }
             }
         });

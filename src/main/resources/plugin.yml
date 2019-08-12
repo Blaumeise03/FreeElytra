@@ -10,6 +10,8 @@ commands:
     description: Fügt ein StartPad hinzu.
   removePad:
     description: Löscht ein StartPad.
+  listPads:
+    description: Listet alle Pads auf.
 permissions:
   freeElytra.elytra:
     description: Permission for Getting an Elytra
