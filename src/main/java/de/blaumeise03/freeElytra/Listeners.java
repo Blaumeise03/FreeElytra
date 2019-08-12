@@ -55,7 +55,8 @@ public class Listeners implements Listener {
     public void onDamage(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player) {
             if (FreeElytra.hasPlayerDamageProtection((Player) e.getEntity())) {
-                e.setCancelled(true); //Please don't die, I would loose my Elytra!
+                if (!(e.getCause() == EntityDamageEvent.DamageCause.VOID))
+                    e.setCancelled(true); //Please don't die, I would loose my Elytra!
             }
         }
     }
