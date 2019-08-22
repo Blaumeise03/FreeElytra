@@ -18,6 +18,8 @@
 
 package de.blaumeise03.freeElytra;
 
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,8 +27,12 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.Arrays;
+import java.util.ListIterator;
 
 public class Listeners implements Listener {
 
@@ -35,7 +41,7 @@ public class Listeners implements Listener {
         if (FreeElytra.hasPlayerElytra(e.getPlayer()) && !StartPadListeners.delay.contains(e.getPlayer()))
             if (e.getPlayer().isOnGround()) {
                 //Give me back my Elytra
-                e.getPlayer().getInventory().setChestplate(FreeElytra.getChestplate(e.getPlayer()));
+                e.getPlayer().getInventory().setChestplate(new ItemStack(Material.AIR));
                 FreeElytra.removePlayer(e.getPlayer());
                 FreeElytra.removePlayerDamage(e.getPlayer());
 
@@ -67,6 +73,30 @@ public class Listeners implements Listener {
             e.getPlayer().getInventory().setChestplate(FreeElytra.getChestplate(e.getPlayer()));
             FreeElytra.removePlayer(e.getPlayer());
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 300, 5));
+        }
+        if (FreeElytra.isPlayerChecked(e.getPlayer())) {
+            Player p = e.getPlayer();
+            if (p.getInventory().contains(Material.ELYTRA)) {
+                ListIterator<ItemStack> iterator = p.getInventory().iterator();
+                while (iterator.hasNext()) {
+                    ItemStack stack = iterator.next();
+                    if (stack.getType() == Material.ELYTRA) {
+                        if (stack.containsEnchantment(Enchantment.DURABILITY)) {
+                            if (stack.getEnchantmentLevel(Enchantment.ARROW_DAMAGE) == 10) {
+                                try {
+                                    if (stack.getItemMeta().getLore().equals(Arrays.asList("§4Leih Elytra", "§6Wird nach dem Flug automatisch abgegeben!"))) {
+                                        p.getInventory().remove(stack);
+                                        break;
+                                    }
+                                } catch (NullPointerException ignored) {
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                FreeElytra.addCheckedPlayer(p);
+            }
         }
     }
 }

@@ -53,9 +53,11 @@ public class FreeElytra extends JavaPlugin {
 
     private static Map<Player, ItemStack> chestplates = new HashMap<>(); //We won't the Players to loose their Stuff :c
     private static List<Player> damageDelay = new ArrayList<>(); //To prevent Player from taking damage directly after loosing the Elytra
+    private static List<Player> checkedPlayers = new ArrayList<>(); //Tp prevent Player from stealing the Elytra
 
     private static FileConfiguration configuration;
     private static File confF;
+
 
     public static boolean hasPlayerElytra(Player p) {
         return chestplates.containsKey(p);
@@ -80,6 +82,14 @@ public class FreeElytra extends JavaPlugin {
                 damageDelay.remove(p);
             }
         }, 10);
+    }
+
+    public static boolean isPlayerChecked(Player p) {
+        return checkedPlayers.contains(p);
+    }
+
+    public static void addCheckedPlayer(Player p) {
+        checkedPlayers.add(p);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -119,6 +129,14 @@ public class FreeElytra extends JavaPlugin {
     }
 
     public static void shootPlayer(Player player) {
+        if (player.getInventory().firstEmpty() != -1) {
+            if (player.getInventory().getChestplate() != null)
+                player.getInventory().addItem(player.getInventory().getChestplate());
+        } else {
+            player.sendMessage("§4Dein Inventar ist voll!");
+            return;
+        }
+        checkedPlayers.remove(player);
 
         if (!chestplates.containsKey(player)) {
             chestplates.put(player, player.getInventory().getChestplate());
