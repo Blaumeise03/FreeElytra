@@ -291,8 +291,10 @@ public class FreeElytra extends JavaPlugin {
             getLogger().warning("WARNING! Some Players have an Elytra!");
             getLogger().warning("The Players might have got their Chestplate back.");
             getLogger().warning("SAVING TO LOG...");
-            File file = new File(("elytraLog" + Bukkit.getWorlds().get(0).getTime() + ".txt"));
+            File file = new File(("elytraLogs/elytraLog-" + Bukkit.getWorlds().get(0).getTime() + ".txt"));
             try {
+                //noinspection ResultOfMethodCallIgnored
+                file.getParentFile().mkdirs();
                 //noinspection ResultOfMethodCallIgnored
                 file.createNewFile();
             } catch (IOException e) {
@@ -311,11 +313,12 @@ public class FreeElytra extends JavaPlugin {
                     ItemStack c = chestplates.get(p);
                     fileWriter.write("=====\nPlayer: " + p.getName() + "\nUUID: " + p.getUniqueId());
                     fileWriter.write("\nRestore (this might not be correct): " + restore);
-                    fileWriter.write("\nChestplate: \n" + c.getType().name());
+                    fileWriter.write("\nChestplate: \n" + (c == null ? "EMPTY" : c.getType().name()));
                     fileWriter.write("\nEnchantments:\n");
-                    for (Enchantment e : c.getEnchantments().keySet()) {
-                        fileWriter.write(e.toString() + ": " + c.getEnchantments().get(e) + "\n");
-                    }
+                    if (c != null)
+                        for (Enchantment e : c.getEnchantments().keySet()) {
+                            fileWriter.write(e.toString() + ": " + c.getEnchantments().get(e) + "\n");
+                        }
                 }
                 fileWriter.close();
                 getLogger().warning("SAVED TO LOG \"" + file.getAbsolutePath() + "\"");
@@ -330,12 +333,13 @@ public class FreeElytra extends JavaPlugin {
                 getLogger().warning("UUID: " + p.getUniqueId());
                 getLogger().warning("We try to restore the Item. For a information look into the log wich will be generated, but it might not be accurate.");
                 getLogger().warning("Chestplate:");
-                getLogger().warning(c.getType().name());
+                getLogger().warning(c == null ? "EMPTY" : c.getType().name());
                 getLogger().warning("");
                 getLogger().warning("Enchantments:");
-                for (Enchantment e : c.getEnchantments().keySet()) {
-                    getLogger().warning(e.toString() + ": " + c.getEnchantments().get(e));
-                }
+                if (c != null)
+                    for (Enchantment e : c.getEnchantments().keySet()) {
+                        getLogger().warning(e.toString() + ": " + c.getEnchantments().get(e));
+                    }
             }
             getLogger().warning("==================LOG COMPLETE==================");
         }
