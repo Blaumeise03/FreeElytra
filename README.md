@@ -16,6 +16,7 @@ Befehle:
  - /elytra \[Player\] : Gibt dir (oder dem angegebenen Spieler) eine Leih-Elytra
  - /addPad \<name\> \<x1\> \<y1\> \<z1\> \<x2\> \<y2\> \<z2\> : Erstellt ein neues StartPad
  - /removePad <name> : Löscht ein StartPad
+ - /listPads : Listet alle Startpads auf
 
 Permissions:
  - freeElytra.elytra : Berechtigung um /elytra auzuführen
