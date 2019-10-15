@@ -1,8 +1,9 @@
 name: FreeElytra
 version: 1.0-Beta
 main: de.blaumeise03.freeElytra.FreeElytra
-author: Blaumeise03
 api-version: 1.13
+author: Blaumeise03
+website: http://blaumeise03.de/
 
 commands:
   elytra:

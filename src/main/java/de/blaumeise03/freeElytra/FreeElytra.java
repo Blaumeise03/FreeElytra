@@ -29,6 +29,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
@@ -143,10 +144,16 @@ public class FreeElytra extends JavaPlugin {
         }
         damageDelay.add(player);
         ItemStack elytra = new ItemStack(Material.ELYTRA);
-        elytra.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+        //elytra.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+        elytra.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
+        elytra.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
         ItemMeta meta = elytra.getItemMeta();
         assert meta != null;
-        meta.setLore(Arrays.asList("§4Leih Elytra", "§6Wird nach dem Flug automatisch abgegeben!"));
+        meta.setLore(Arrays.asList("§6Wird nach dem Flug automagisch zurückgegeben!"));
+        meta.setDisplayName("§4Leih-Elytren");
+        meta.setUnbreakable(true);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         elytra.setItemMeta(meta);
         player.getInventory().setChestplate(elytra);
         FreeElytra.plugin.getLogger().info(player.getName() + " got an Elytra!");
@@ -286,6 +293,7 @@ public class FreeElytra extends JavaPlugin {
     @Override
     public void onDisable() {
         getLogger().info("Disabling...");
+        checkedPlayers = new ArrayList<>();
         if (chestplates.size() != 0) {
             getLogger().warning("==================STARTING LOG==================");
             getLogger().warning("WARNING! Some Players have an Elytra!");
