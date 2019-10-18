@@ -34,6 +34,8 @@ public class StartPadListeners implements Listener {
     public void onMove(PlayerMoveEvent e) {
         if (StartPad.isPads(e.getPlayer().getLocation())) {
             if (!delay.contains(e.getPlayer())) {
+                Listeners.checkPlayer(e.getPlayer(), true);
+                FreeElytra.removeCheckedPlayer(e.getPlayer());
                 FreeElytra.shootPlayer(e.getPlayer());
                 delay.add(e.getPlayer());
                 Bukkit.getScheduler().runTaskLaterAsynchronously(FreeElytra.plugin, () -> delay.remove(e.getPlayer()), 10);

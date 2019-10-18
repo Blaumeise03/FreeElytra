@@ -93,6 +93,10 @@ public class FreeElytra extends JavaPlugin {
         checkedPlayers.add(p);
     }
 
+    public static void removeCheckedPlayer(Player p) {
+        checkedPlayers.remove(p);
+    }
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void createConfigs() {
         confF = new File(getDataFolder(), "config.yml");
@@ -131,8 +135,10 @@ public class FreeElytra extends JavaPlugin {
 
     public static void shootPlayer(Player player) {
         if (player.getInventory().firstEmpty() != -1) {
-            if (player.getInventory().getChestplate() != null)
+            if (player.getInventory().getChestplate() != null) {
+
                 player.getInventory().addItem(player.getInventory().getChestplate());
+            }
         } else {
             player.sendMessage("§4Dein Inventar ist voll!");
             return;

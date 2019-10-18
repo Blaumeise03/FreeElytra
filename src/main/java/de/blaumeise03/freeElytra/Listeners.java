@@ -19,7 +19,6 @@
 package de.blaumeise03.freeElytra;
 
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,29 +31,22 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ListIterator;
-
 public class Listeners implements Listener {
 
-    private static void checkPlayer(Player p) {
-        if (!FreeElytra.isPlayerChecked(p))
+    public static void checkPlayer(Player p, boolean force) {
+        if (!FreeElytra.isPlayerChecked(p) || force)
             if (p.getInventory().contains(Material.ELYTRA)) {
-                ListIterator<ItemStack> iterator = p.getInventory().iterator();
-                while (iterator.hasNext()) {
-                    ItemStack stack = iterator.next();
-                    if (stack.getType() == Material.ELYTRA) {
-                        if (stack.containsEnchantment(Enchantment.DURABILITY)) {
-                            if (stack.getEnchantmentLevel(Enchantment.ARROW_DAMAGE) == 10) {
-                                try {
-                                    if (stack.getItemMeta().getDisplayName().equalsIgnoreCase("§4Leih-Elytren")) {
+                for (ItemStack stack : p.getInventory()) {
+                    if (stack != null)
+                        if (stack.getType() == Material.ELYTRA) {
+                            try {
+                                if (stack.getItemMeta().getDisplayName().equalsIgnoreCase("§4Leih-Elytren")) {
+                                    if (stack.getItemMeta().getLore().get(0).equalsIgnoreCase("§6Wird nach dem Flug automagisch zurückgegeben!"))
                                         p.getInventory().remove(stack);
-                                        break;
-                                    }
-                                } catch (NullPointerException ignored) {
                                 }
+                            } catch (NullPointerException ignored) {
                             }
                         }
-                    }
                 }
             } else {
                 FreeElytra.addCheckedPlayer(p);
@@ -103,7 +95,7 @@ public class Listeners implements Listener {
                 FreeElytra.removePlayerDamage(e.getPlayer());
 
             }
-        checkPlayer(e.getPlayer());
+        checkPlayer(e.getPlayer(), false);
     }
 
     @EventHandler
@@ -111,9 +103,10 @@ public class Listeners implements Listener {
         if (FreeElytra.hasPlayerElytra(e.getPlayer())) {
             e.getPlayer().getInventory().setChestplate(FreeElytra.getChestplate(e.getPlayer()));
             FreeElytra.removePlayer(e.getPlayer());
+            FreeElytra.removeCheckedPlayer(e.getPlayer());
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 300, 5));
 
         }
-        checkPlayer(e.getPlayer());
+        checkPlayer(e.getPlayer(), false);
     }
 }
