@@ -8,12 +8,16 @@ website: http://blaumeise03.de/
 commands:
   elytra:
     description: Gibt dir eine Kostenlose Elytra (ein Flug)
+    permission: freeElytra.elytra
   addPad:
     description: Fügt ein StartPad hinzu.
+    permission: freeElytra.settings
   removePad:
     description: Löscht ein StartPad.
+    permission: freeElytra.settings
   listPads:
     description: Listet alle Pads auf.
+    permission: freeElytra.settings
 permissions:
   freeElytra.elytra:
     description: Permission for Getting an Elytra
