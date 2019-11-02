@@ -1,19 +1,6 @@
 
 /*
- *     Copyright (C) 2019  Blaumeise03 - bluegame61@gmail.com
- *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU Affero General Public License as published
- *     by the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU Affero General Public License for more details.
- *
- *     You should have received a copy of the GNU Affero General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * Copyright (c) 2019 Blaumeise03
  */
 
 package de.blaumeise03.freeElytra;
@@ -24,33 +11,58 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Listeners implements Listener {
+    private static Map<Player, Long> lastChecked = new HashMap<>();
 
     public static void checkPlayer(Player p, boolean force) {
-        if (!FreeElytra.isPlayerChecked(p) || force)
+        if (!FreeElytra.isPlayerChecked(p) || force) {
+            lastChecked.put(p, System.currentTimeMillis());
+            boolean clean = true;
             if (p.getInventory().contains(Material.ELYTRA)) {
                 for (ItemStack stack : p.getInventory()) {
                     if (stack != null)
                         if (stack.getType() == Material.ELYTRA) {
                             try {
                                 if (stack.getItemMeta().getDisplayName().equalsIgnoreCase("§4Leih-Elytren")) {
-                                    if (stack.getItemMeta().getLore().get(0).equalsIgnoreCase("§6Wird nach dem Flug automagisch zurückgegeben!"))
+                                    if (stack.getItemMeta().getLore().get(0).equalsIgnoreCase("§6Wird nach dem Flug automagisch zurückgegeben!")) {
                                         p.getInventory().remove(stack);
+                                        clean = false;
+                                    }
                                 }
                             } catch (NullPointerException ignored) {
                             }
                         }
                 }
-            } else {
-                FreeElytra.addCheckedPlayer(p);
             }
+
+            for (ItemStack stack : p.getInventory().getArmorContents()) {
+                if (stack != null)
+                    if (stack.getType() == Material.ELYTRA) {
+                        try {
+                            if (stack.getItemMeta().getDisplayName().equalsIgnoreCase("§4Leih-Elytren")) {
+                                if (stack.getItemMeta().getLore().get(0).equalsIgnoreCase("§6Wird nach dem Flug automagisch zurückgegeben!")) {
+                                    p.getInventory().remove(stack);
+                                    clean = false;
+                                }
+                            }
+                        } catch (NullPointerException ignored) {
+                        }
+                    }
+            }
+
+            if (clean) FreeElytra.addCheckedPlayer(p);
+
+        }
     }
 
     @EventHandler
@@ -66,14 +78,16 @@ public class Listeners implements Listener {
         }
     }
 
-    /*@EventHandler
+    @EventHandler
     public void onInventoryInteract(InventoryClickEvent e) {
-        if (FreeElytra.hasPlayerElytra((Player) e.getWhoClicked())) {
-            e.setCancelled(true);
-            e.getWhoClicked().getOpenInventory().close();
-            e.getWhoClicked().sendMessage("§4Das darfst du nicht!");
+        if (!FreeElytra.hasPlayerElytra((Player) e.getWhoClicked())) {
+            Player p = (Player) e.getWhoClicked();
+            if (!lastChecked.containsKey(p))
+                checkPlayer(p, true);
+            if (lastChecked.get(p) > 2000)
+                checkPlayer(p, true);
         }
-    }*/
+    }
 
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
@@ -85,7 +99,7 @@ public class Listeners implements Listener {
         }
     }
 
-    @EventHandler
+    /*EventHandler
     public void onMove(final PlayerMoveEvent e) {
         if (FreeElytra.hasPlayerElytra(e.getPlayer()) && !StartPadListeners.delay.contains(e.getPlayer()))
             if (e.getPlayer().isOnGround()) {
@@ -96,7 +110,7 @@ public class Listeners implements Listener {
 
             }
         checkPlayer(e.getPlayer(), false);
-    }
+    }*/
 
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
